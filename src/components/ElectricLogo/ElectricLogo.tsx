@@ -394,7 +394,7 @@ uniform float uTime;
 uniform float uPresence;
 uniform vec3 uHover;
 uniform float uHoverRadius;
-uniform vec4 uPulses[\${PULSES}];
+uniform vec4 uPulses[${PULSES}];
 uniform float uPulseBoost;
 uniform float uFlash;
 uniform vec3 uColor;
@@ -408,8 +408,8 @@ uniform float uCrackle;
 uniform float uFlicker;
 uniform float uFill;
 uniform float uInk;
-uniform vec4 uArcEnds[\${ARCS}];
-uniform vec4 uArcShape[\${ARCS}];
+uniform vec4 uArcEnds[${ARCS}];
+uniform vec4 uArcShape[${ARCS}];
 
 in vec2 vUv;
 out vec4 fragColor;
@@ -431,7 +431,7 @@ float fieldAt(sampler2D tex, vec4 map, vec4 size, vec2 p) {
 
 vec2 glowAt(sampler2D tex, vec4 map, vec4 size, vec2 p) {
   vec2 f = (p - map.xy) / map.z - map.w;
-  return textureLod(tex, f / (size.zw * \${CELL}.0), 0.0).rg;
+  return textureLod(tex, f / (size.zw * ${CELL}.0), 0.0).rg;
 }
 
 float shape(vec2 p, float k) {
@@ -486,7 +486,7 @@ vec2 ripple(vec2 p, float surge) {
   vec2 push = vec2(0.0);
   surge = 0.0;
   float width = uUnit * 10.0;
-  for (int i = 0; i < \${PULSES}; i++) {
+  for (int i = 0; i < ${PULSES}; i++) {
     vec4 pulse = uPulses[i];
     if (pulse.w <= 0.0) continue;
     vec2 d = p - pulse.xy;
@@ -629,7 +629,7 @@ void main() {
     energy *= grow;
   }
 
-  for (int i = 0; i < \${ARCS}; i++) addArc(pr, uArcEnds[i], uArcShape[i], t, light, energy, hot);
+  for (int i = 0; i < ${ARCS}; i++) addArc(pr, uArcEnds[i], uArcShape[i], t, light, energy, hot);
 
   float gain = uIntensity * breath * (1.0 + heat * 0.45) * (1.0 + uFlash * 0.3) * 1.4;
   float alpha = 1.0 - exp(-energy * gain);
