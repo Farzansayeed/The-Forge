@@ -1,6 +1,6 @@
 import { lazy, Suspense, useEffect, useState } from 'react';
 import { NavLink, Route, Routes, useLocation } from 'react-router-dom';
-import { AnimatePresence, motion } from 'motion/react';
+import { AnimatePresence, motion, MotionConfig } from 'motion/react';
 import { TopBar } from './TopBar';
 import { ErrorBoundary } from './ErrorBoundary';
 import { useLenis } from './useLenis';
@@ -167,6 +167,7 @@ export default function App() {
 
   return (
     <ErrorBoundary>
+      <MotionConfig reducedMotion="user"> {/* U9: engine-level reduced-motion for every motion.* below */}
       <IntroGate>
         <DreadProvider />
         <RoastOverlay />
@@ -222,6 +223,7 @@ export default function App() {
         </main>
       </div>
       </IntroGate>
+      </MotionConfig>
     </ErrorBoundary>
   );
 }

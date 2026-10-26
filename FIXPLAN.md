@@ -263,7 +263,7 @@ Individually small, semantically grouped (one commit):
 | WS2 | persistence fail-safety | DONE | 2026-10-26 | this commit | 99 |
 | WS3 | local day key everywhere | DONE | 2026-10-26 | this commit | 104 |
 | WS4 | WCAG AA contrast | DONE (scope extended: 6 tokens) | 2026-10-26 | this commit | 104 |
-| WS5 | MotionConfig reduced motion | TODO | — | — | 94 |
+| WS5 | MotionConfig reduced motion | DONE | 2026-10-26 | this commit | 104 |
 | WS6 | scroll contract | TODO | — | — | 94 |
 | WS7 | quiz chrome sticky | TODO | — | — | 94 |
 | WS8 | SW hardening + versioning | TODO | — | — | 94 |
@@ -344,3 +344,16 @@ Individually small, semantically grouped (one commit):
   Screenshots reviewed (fx-ws4-{today,roadmap}-{dark,light}.png + stats): hierarchy intact, no
   surprise design change; console clean. Gates typecheck ✓ 104/104 ✓ build ✓ (459.39 kB /
   150.68 gz). Commit: `Design: --faint and light --p5 retuned to 4.5:1 (both themes)`.
+- 2026-10-26 — **WS5 done.** `<MotionConfig reducedMotion="user">` (motion/react) wraps the
+  app subtree in `App.tsx` — the routed tree plus onboarding/roast/bedtime/palette overlays all
+  honor the OS preference; the intro gate's own visuals are untouched (already self-gated via its
+  own matchMedia). Verified with Playwright reduced-motion context emulation (agent-browser's
+  `media` subcommand doesn't exist in this build despite the help text — recorded honestly).
+  Frame-sampled route-push transforms: under reduce, exit is a constant `matrix(…,-8)` jump-cut
+  and the enter wrapper's transform is dropped after one 16 ms initial frame (zero interpolation)
+  — opacity cross-fades remain, allowed per contract; under no-preference, both directions
+  interpolate smoothly (−7.99→−8.00 exit, 7.84→0.0003 enter over ~180 ms) — so normal motion is
+  unregressed. CSS kill-switch re-confirmed (`body` transition-duration 1e-05s under reduce).
+  Gates typecheck ✓ 104/104 ✓ build ✓ (entry 459.76 kB / 150.81 gz, +0.37 kB for the wrapper).
+  Emulation dev-logs: two Playwright runs (`reduced_motion` context), console clean. Commit:
+  `Motion: honor prefers-reduced-motion in the engine (MotionConfig)`.
