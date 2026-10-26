@@ -1,6 +1,15 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { defaultData, isValidAppData, SCHEMA_VERSION } from './schema';
-import { exportData, flushSave, importData, loadData, saveData } from './storage';
+import {
+  exportData,
+  flushSave,
+  importData,
+  loadData,
+  saveData,
+  BACKUP_KEY,
+  hasCorruptBackup,
+  isSaveDegraded,
+} from './storage';
 
 describe('storage layer', () => {
   beforeEach(() => {
@@ -58,6 +67,59 @@ describe('storage layer', () => {
     const d = loadData();
     expect(isValidAppData(d)).toBe(true);
     expect(d.xp).toBe(0);
+  });
+
+  it('stashes a corrupt payload at the backup key before serving defaults', () => {
+    window.localStorage.setItem('cdr-v3', '{not json');
+    const d = loadData();
+    expect(d.version).toBe(SCHEMA_VERSION);
+    expect(window.localStorage.getItem(BACKUP_KEY)).toBe('{not json');
+    expect(hasCorruptBackup()).toBe(true);
+  });
+
+  it('stashes structurally invalid payloads the same way (valid JSON, wrong shape)', () => {
+    const raw = JSON.stringify({ version: 99, hello: 1 });
+    window.localStorage.setItem('cdr-v3', raw);
+    const d = loadData();
+    expect(d.version).toBe(SCHEMA_VERSION);
+    expect(window.localStorage.getItem(BACKUP_KEY)).toBe(raw);
+  });
+
+  it('keeps the FIRST corrupt stash — later corruptions never overwrite it', () => {
+    window.localStorage.setItem('cdr-v3', 'first corrupt');
+    loadData();
+    window.localStorage.setItem('cdr-v3', 'second corrupt');
+    const d = loadData();
+    expect(d.version).toBe(SCHEMA_VERSION);
+    expect(window.localStorage.getItem(BACKUP_KEY)).toBe('first corrupt');
+  });
+
+  it('never creates a backup for healthy state or empty storage', () => {
+    expect(hasCorruptBackup()).toBe(false);
+    loadData(); // empty storage
+    expect(hasCorruptBackup()).toBe(false);
+    window.localStorage.setItem('cdr-v3', JSON.stringify(defaultData()));
+    loadData(); // valid schema
+    expect(hasCorruptBackup()).toBe(false);
+  });
+
+  it('keeps pending on a rejected write and retries it on the next flush', () => {
+    const d = defaultData();
+    d.xp = 5;
+    saveData(d);
+    const spy = vi.spyOn(Storage.prototype, 'setItem').mockImplementation(() => {
+      throw new Error('quota exceeded');
+    });
+    vi.advanceTimersByTime(200); // debounced write fails
+    expect(isSaveDegraded()).toBe(true);
+    expect(loadData().xp).toBe(5); // in-memory pending still serves the newest state
+    expect(JSON.parse(window.localStorage.getItem('cdr-v3') ?? '{"xp":null}').xp).toBeNull();
+    // storage recovers → the buffered work must land on the next flush
+    spy.mockRestore();
+    flushSave();
+    expect(isSaveDegraded()).toBe(false);
+    expect(loadData().xp).toBe(5);
+    expect(JSON.parse(window.localStorage.getItem('cdr-v3') ?? '{"xp":null}').xp).toBe(5);
   });
 
   it('falls back to a fresh default on structurally invalid data', () => {

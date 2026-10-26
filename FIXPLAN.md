@@ -252,7 +252,7 @@ Individually small, semantically grouped (one commit):
 | WS | Scope | Status | Last touched | Commit | Tests |
 |----|-------|--------|--------------|--------|-------|
 | WS1 | verdict-dialog orphan scrim | DONE (blocker retracted → trap hardening + scrim token) | 2026-10-26 | this commit | 94 |
-| WS2 | persistence fail-safety | TODO | — | — | 94 |
+| WS2 | persistence fail-safety | DONE | 2026-10-26 | this commit | 99 |
 | WS3 | local day key everywhere | TODO | — | — | 94 |
 | WS4 | WCAG AA contrast | TODO | — | — | 94 |
 | WS5 | MotionConfig reduced motion | TODO | — | — | 94 |
@@ -286,3 +286,18 @@ Individually small, semantically grouped (one commit):
   `fx-ws1-verdict-{dark,light}.png`; console clean; typecheck ✓; 94/94 ✓; build ✓
   (entry 459.06 kB / 150.52 gz). Commit: `Modal: harden trap lifecycle, theme-native scrim;
   audit blocker #1 corrected`.
+- 2026-10-26 — **WS2 done.** `storage.ts`: corrupt payloads (bad JSON, invalid shape, failed
+  migration) are stashed at `BACKUP_KEY` (`cdr-v3.bak`) exactly once — first corrupt snapshot wins,
+  never overwritten — before fresh defaults serve; failed `setItem` no longer consumes `pending`
+  (work retried on next flush/pagehide) and sets a one-bit `degraded` flag, cleared on first
+  success; new exports `BACKUP_KEY / isSaveDegraded() / hasCorruptBackup()`. Diagnostics gained a
+  `Save reliability` row between "Storage writable" and "Curriculum" (WARN for degraded writes or an
+  existing corrupt backup, honest recovery guidance in the detail). +5 unit tests (stash on corrupt
+  JSON, stash on invalid shape, first-stash-wins, healthy loads never stash, rejected write keeps
+  pending + flush retry + flag self-heal) → **99/99**; README + ARCHITECTURE counts updated. Verified
+  live (rebuilt dist, agent-browser): injected `CORRUPTED-BY-WS2-VERIFICATION` into `cdr-v3` → reload
+  → payload recovered verbatim from `cdr-v3.bak`, app served defaults, Diagnostics showed
+  `Save reliability — WARN` (screenshot `fx-ws2-diagnostics2.png`, headline "MINOR SCARS"); real
+  ledger restored byte-identical (299 bytes), `.bak`/temp keys removed, app reloaded clean, console
+  clean; gates typecheck ✓ 99/99 ✓ build ✓ (entry 459.32 kB / 150.62 gz). Commit:
+  `Storage: never clobber corrupt state, keep pending work on write failure`.

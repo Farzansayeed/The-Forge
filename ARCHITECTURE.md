@@ -70,12 +70,12 @@ features/    the 8 pages — render only, never compute
 | Add roasts/excuses | `data/roast.ts` (tier 1–5; the intensity dial caps tiers: mild ≤ 2, spicy ≤ 4, nuclear = 5). |
 | Install a React Bits piece | `npx shadcn@latest add @react-bits/<Name>-TS-TW` → lands in `components/bits/` → re-point its colors/fonts to the tokens. |
 
-## Tests map (94 total, `npm test`)
+## Tests map (99 total, `npm test`)
 
 | Suite | Covers |
 |---|---|
 | `engines/*.test.ts` | schedule (leap years, postpones, catch-up interplay), quiz selection/scoring, SM-2 boundaries, dread/streak math, tribunal/bedtime, XP/ranks, progress counts |
-| `lib/storage.test.ts` | debts to the debouncer, validation fallback, export/import round-trip |
+| `lib/storage.test.ts` | debts to the debouncer, validation fallback with first-wins `.bak` stash of corrupt payloads, failed-write → pending retained + flush retry, export/import round-trip |
 | `lib/v2import.test.ts` | legacy ledger mapping |
 | `data/curriculum/validate.test.ts` | curriculum structure + resource canon hygiene |
 | `data/quizzes/validate.test.ts` | blueprint counts + quiz-ref integrity — the "content gap = red build" guarantee |

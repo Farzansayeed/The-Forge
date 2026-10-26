@@ -2,7 +2,7 @@ import { useMemo } from 'react';
 import { STAGES } from '../../data/curriculum';
 import { QUIZ_SETS, quizSetsForStage } from '../../data/quizzes';
 import { BLUEPRINT, BOSS_BLUEPRINT, COVERED_STAGES, COVERED_BOSSES } from '../../data/quizzes/blueprint';
-import { loadData } from '../../lib/storage';
+import { loadData, BACKUP_KEY, hasCorruptBackup, isSaveDegraded } from '../../lib/storage';
 import { buildSchedule } from '../../engines/schedule';
 import { todayKey } from '../../lib/schema';
 
@@ -52,6 +52,22 @@ function checkStorageWritable(): Check {
   } catch {
     return { name: 'Storage writable', status: 'fail', detail: 'localStorage blocked (private mode? quota?) — progress will not save' };
   }
+}
+
+function checkSaveReliability(): Check {
+  if (isSaveDegraded())
+    return {
+      name: 'Save reliability',
+      status: 'warn',
+      detail: 'a save was rejected this session (quota / private mode) — newer work kept in memory, retried on exit',
+    };
+  if (hasCorruptBackup())
+    return {
+      name: 'Save reliability',
+      status: 'warn',
+      detail: `a corrupt save was preserved at ${BACKUP_KEY} earlier — export it before clearing browser data`,
+    };
+  return { name: 'Save reliability', status: 'ok', detail: 'writes land without rejections · no corrupt payloads preserved' };
 }
 
 function checkCurriculum(): Check {
@@ -146,6 +162,7 @@ export function DiagnosticsPage() {
     () => [
       checkJsonStorage(),
       checkStorageWritable(),
+      checkSaveReliability(),
       checkCurriculum(),
       checkQuizRegistry(),
       checkBlueprintCounts(),
