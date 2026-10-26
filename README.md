@@ -4,7 +4,7 @@
 
 You set the schedule. The Forge holds you to it — every topic, every quiz, every missed day is tracked, scheduled, and eventually avenged through spaced review.
 
-**Live:** https://c-learning-gamma.vercel.app/
+**Live:** https://the-forge-cdsa.vercel.app/
 
 Every push to `main` auto-deploys via Vercel (CI runs typecheck + tests + build first).
 
