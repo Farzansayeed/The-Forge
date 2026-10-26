@@ -27,6 +27,11 @@ export interface DayRecord {
   hoursLogged: number;
   verdict?: Verdict;
   closedAt?: string;
+  /** WS9 live focus-timer snapshot — reload/route-hop restores it unchanged; cleared on Log. */
+  timerStartedAt?: number; // epoch ms the current run segment began
+  timerPaused?: boolean; // true → restore paused at baseSeconds
+  baseSeconds?: number; // seconds banked before the current run segment
+  timerStrict?: boolean; // STRICT checkbox state of the live session
 }
 
 export interface FocusSession {

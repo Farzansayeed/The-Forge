@@ -267,7 +267,7 @@ Individually small, semantically grouped (one commit):
 | WS6 | scroll contract | DONE | 2026-10-26 | this commit | 104 |
 | WS7 | quiz chrome sticky | DONE (scope +1: mobile chrome row) | 2026-10-26 | this commit | 104 |
 | WS8 | SW hardening + versioning | DONE (scope +1: asset-manifest precache) | 2026-10-26 | this commit | 104 |
-| WS9 | timer survives reload | TODO | — | — | 94 |
+| WS9 | timer survives reload | DONE (day-record snapshot persist; latent pagehide journal never landed — fixed) | 2026-10-26 | this commit | 108 |
 | WS10 | shared Button states | TODO | — | — | 94 |
 | WS11 | docs truth-up + dead code | TODO | — | — | 94 |
 | WS12 | copy consistency batch | TODO | — | — | 94 |
@@ -421,3 +421,31 @@ Individually small, semantically grouped (one commit):
   meaningless. Gates typecheck ✓ 104/104 ✓ build ✓ (entry 460.03 kB / 150.93 gz — unbundled
   file). Commit: `PWA: build-injected SW version, full cache pruning, awaited revalidate,
   localhost registration`.
+- 2026-10-26 — **WS9 done.** Focus timer survives reload. `DayRecord` gains an optional live-timer
+  snapshot `{timerStartedAt, timerPaused, baseSeconds, timerStrict}` (validator untouched — per-day
+  fields are as lax as every other optional). `useFocusTimer` keeps the exact start/pause/resume/
+  journal math, but the live session now snapshots onto `days[today]` through the debounced save at
+  every transition (start/pause/resume/STRICT-toggle), and mount restores from that record: running →
+  `elapsed = baseSeconds + (now − startedAt)` with the SAME wall-clock anchor (ticking continues),
+  paused → restores paused frozen; the STRICT checkbox reconciles from `timerStrict`. pagehide and
+  SPA unmount persist the snapshot (`flushSave()` after `saveData`) instead of journaling — so a
+  reload can no longer double-count `focusSessions`, and the latent bug is fixed properly: the old
+  pagehide/Unmount journal wrote into the pending debounced buffer only AFTER the storage module's
+  own pagehide flush (registered first) had already run, so it could never land on a real reload;
+  the snapshot path flushes itself. Journaling now happens ONLY on an explicit ✓ Log (identical
+  behavior: <30s is noise, minutes = round) — which additionally means a sub-30s session no longer
+  silently evaporates on refresh (measured 12s restore). Tests 104 → 108 (new `features/today/
+  useFocusTimer.test.ts`: running restore + exact tick, paused restore frozen, reload-never-journals
+  + Log-once + STRICT reconcile, 12s survival). Live verify (vite preview + Playwright, defaults,
+  pre-bedtime): start → 00:20 → STRICT on → reload → 00:25 → 00:28 still ticking (Pause/Log buttons,
+  checkbox still checked); pause → reload → restores paused at the same frozen 00:28 (muted clock,
+  Resume/Log); Log at 00:33 → exactly one `focusSessions` entry `{date, minutes 1, strict:false}`,
+  snapshot fields cleared, clock 00:00; START screen sane; console + failed-request list empty;
+  seven screenshots reviewed (intro Skip + pre-bedtime handling noted). Accepted + recorded edges:
+  (1) a session spanning midnight keeps its snapshot on the old day's record and the new day mounts
+  idle — bedtime lockout is the mitigating layer; (2) the contract restore formula counts the
+  closed-tab interval as session time (pause first to freeze); (3) the timer creates a minimal day
+  record `{key, kind:'study', itemIds:[], hoursLogged:0}` when absent — the same ledger class
+  `daily.ts` setHours/closeDay already produce (readers are verdict-gated; past-day walks only see
+  PAST days). Gates typecheck ✓ 108/108 ✓ build ✓ (entry 460.03 → 460.81 kB / 151.13 gz, +0.78 kB).
+  Commit: `Timer: running focus session resumes across reload`.

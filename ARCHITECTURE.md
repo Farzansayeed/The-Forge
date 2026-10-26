@@ -70,7 +70,7 @@ features/    the 8 pages — render only, never compute
 | Add roasts/excuses | `data/roast.ts` (tier 1–5; the intensity dial caps tiers: mild ≤ 2, spicy ≤ 4, nuclear = 5). |
 | Install a React Bits piece | `npx shadcn@latest add @react-bits/<Name>-TS-TW` → lands in `components/bits/` → re-point its colors/fonts to the tokens. |
 
-## Tests map (104 total, `npm test`)
+## Tests map (108 total, `npm test`)
 
 | Suite | Covers |
 |---|---|
@@ -82,6 +82,7 @@ features/    the 8 pages — render only, never compute
 | `data/quizzes/validate.test.ts` | blueprint counts + quiz-ref integrity — the "content gap = red build" guarantee |
 | `app/IntroGate.test.tsx` | the intro lifecycle (timer-based, reduced-motion off-switch) + the "keys after done never resurrect the overlay" regression |
 | `stores/daily.test.ts` | day rollover — 30 s poll and visibility-restore both roll the store onto the new local key (fake timers, midday-anchored) |
+| `features/today/useFocusTimer.test.ts` | the WS9/U7 reload contract — running + paused sessions restore from the day-record snapshot on the same wall-clock anchor, a reload never journals (sub-30s sessions survive), explicit Log journals once and clears the snapshot, STRICT reconciles |
 
 CI (`.github/workflows/ci.yml`) requires typecheck + tests + build green on every push/PR; `main` auto-deploys to Vercel.
 

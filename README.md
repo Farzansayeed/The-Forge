@@ -52,7 +52,7 @@ Every load opens with **The Ignition** — a WebGL electric Forge logo that crac
 
 1. **Today** opens with your task stack — curriculum topics for the current stage, deep-linked to the roadmap
 2. **Log hours** (½-hour taps or direct entry) toward the day's target; the schedule engine adapts pace, carries debt forward, and auto-inserts catch-up days after two consecutive misses
-3. **Focus timer** with strict mode — sessions ≥30s are journaled; strict sessions are the only ones that earn full credit
+3. **Focus timer** with strict mode — sessions ≥30s are journaled on Log, and a running session itself survives a reload; strict sessions are the only ones that earn full credit
 4. **Close the day** — a staged verdict ritual (honest pass, or fail with a "TARGET MISSED" notice) that locks the day in
 5. **Postpone tribunal** — postponing demands an excuse; the app judges it (valid / invalid / custom) and schedules accordingly
 6. **The streak** — miss days and the 🔥 dies; the dread engine escalates (CLEAN → ELDRITCH) and the roasts get meaner
@@ -88,7 +88,7 @@ Every load opens with **The Ignition** — a WebGL electric Forge logo that crac
 | State | zustand stores (daily, quiz, progress, settings) |
 | Animation | framer-motion + lenis smooth scroll |
 | Routing | react-router-dom v6 (SPA with Vercel rewrite) |
-| Testing | Vitest + jsdom + Testing Library — **104 tests** including the blueprint validator and the v2 importer |
+| Testing | Vitest + jsdom + Testing Library — **108 tests** including the blueprint validator and the v2 importer |
 | Persistence | localStorage (schema v4) + JSON export/import + v2 migration |
 | PWA | `manifest.webmanifest` + zero-dependency service worker |
 | CI | GitHub Actions — typecheck, tests, and build on every push |
@@ -101,7 +101,7 @@ cd The-Forge
 npm install
 
 npm run dev          # vite dev server
-npm test             # vitest run (104 tests)
+npm test             # vitest run (108 tests)
 npm run typecheck    # tsc --noEmit
 npm run build        # typecheck + production build
 npm run preview      # serve the production build locally
