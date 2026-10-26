@@ -21,7 +21,7 @@
   /* ink */
   --text: #e6e1d5;
   --muted: #8b93a3;
-  --faint: #5c6473;
+  --faint: #788594; /* WCAG AA: 4.58–5.13:1 on bg/panels (was #5c6473, 2.89–3.24) */
 
   /* modal veil */
   --scrim: rgba(4, 6, 10, 0.6);
@@ -68,26 +68,26 @@
 
   --text: #1a2233;
   --muted: #5a6478;
-  --faint: #8b94a8;
+  --faint: #656d87; /* WCAG AA: 4.53–5.13:1 on bg/panels (was #8b94a8, 2.69–3.04) */
 
   /* modal veil — ink-tinted for the blueprint page */
   --scrim: rgba(26, 34, 51, 0.35);
 
-  --good: #2e7d5b;
-  --good-dim: rgba(46, 125, 91, 0.1);
+  --good: #026e50; /* WCAG AA: 4.81–6.27:1 on page/panels/dim-chips (was #2e7d5b, 3.91–5.0) */
+  --good-dim: rgba(2, 110, 80, 0.1);
   --danger: #b34038;
   --danger-dim: rgba(179, 64, 56, 0.1);
-  --warn: #8a6d2f;
-  --warn-dim: rgba(138, 109, 47, 0.12);
+  --warn: #725a27; /* WCAG AA: 4.90–6.55:1 (was #8a6d2f, 4.19–5.0) */
+  --warn-dim: rgba(114, 90, 39, 0.12);
   --info: #3e6390;
   --info-dim: rgba(62, 99, 144, 0.1);
 
   --p0: #3e6390;
-  --p1: #2e7d5b;
-  --p2: #8a6d2f;
+  --p1: #026e50; /* Launchpad/accent — green, WCAG AA retune with --good */
+  --p2: #725a27; /* Systems C — amber, WCAG AA retune with --warn */
   --p3: #6b55a8;
-  --p4: #b35a3a;
-  --p5: #9a7d1f;
+  --p4: #a95537; /* Algorithms — coral, WCAG AA: 4.59–5.2:1 (was #b35a3a, 4.18–5.0) */
+  --p5: #856b1a; /* Endgame — gold, WCAG AA: 4.51–5.10:1 (was #9a7d1f, 3.48–3.94) */
 
   --shadow-1: 0 1px 2px rgba(26, 34, 51, 0.06), 0 2px 8px rgba(26, 34, 51, 0.05);
   --shadow-2: 0 4px 16px rgba(26, 34, 51, 0.1);

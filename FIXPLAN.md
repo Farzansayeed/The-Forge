@@ -109,9 +109,13 @@ carries the plan, the rules, the environment quirks, and the status ledger. Upda
 - Retune `--faint` dark+light (`src/styles/tokens.css:24,:68`) and light `--p5` (`:84`) to ≥4.5:1 on
   their real surfaces. Compute with the audit's ratio helper (luminance formula), pick the closest
   acceptable tone; document chosen values in the commit message.
-- Add SVG-check: run `agent-browser a11y` on Today + Roadmap + Stats under both themes → **zero**
+- SCOPE EXTENDED during execution: the axe light-theme run exposed THREE more failing accents the
+  audit's narrow scoping missed — `--p1`/`--good` #2e7d5b (4.42:1 on page, ~3.9:1 on its own
+  good-dim chip over page), `--p2`/`--warn` #8a6d2f (4.30:1 page / 4.19:1 chip), and `--p4`
+  #b35a3a (4.18:1 page). All retuned under the same rule (hue held, only lightness/darkness moved);
+  dim-chip literals follows their ink so chips stay washes of their own accent.
+- SVG-check: run `agent-browser a11y` on Today + Roadmap + Stats under both themes → **zero**
   contrast violations; eyeball month labels/eyebrows at 100% zoom.
-- Keep hue family (no surprise design change); only lift lightness/darkness.
 - **Commit:** `Design: --faint and light --p5 retuned to 4.5:1 (both themes)`
 
 ### WS5 · Reduced motion for the animation engine `[🟠 U9]`
@@ -258,7 +262,7 @@ Individually small, semantically grouped (one commit):
 | WS1 | verdict-dialog orphan scrim | DONE (blocker retracted → trap hardening + scrim token) | 2026-10-26 | this commit | 94 |
 | WS2 | persistence fail-safety | DONE | 2026-10-26 | this commit | 99 |
 | WS3 | local day key everywhere | DONE | 2026-10-26 | this commit | 104 |
-| WS4 | WCAG AA contrast | TODO | — | — | 94 |
+| WS4 | WCAG AA contrast | DONE (scope extended: 6 tokens) | 2026-10-26 | this commit | 104 |
 | WS5 | MotionConfig reduced motion | TODO | — | — | 94 |
 | WS6 | scroll contract | TODO | — | — | 94 |
 | WS7 | quiz chrome sticky | TODO | — | — | 94 |
@@ -323,3 +327,20 @@ Individually small, semantically grouped (one commit):
   `fx-ws3-today.png` reviewed; final-build boot re-checked (day stamp + stack + zero console
   errors); gates typecheck ✓ 104/104 ✓ build ✓ (entry 459.39 kB / 150.68 gz). Commit:
   `Dates: single local day key across dread/tribunal/quiz/arena + midnight rollover`.
+- 2026-10-26 — **WS4 done.** Luminance-computed retunes, hue held, only lightness moved
+  (FIXPLAN §4 rule). As planned: dark `--faint` #5c6473 → **#788594** (2.89–3.24:1 → 4.58–5.13:1 on
+  page/panels), light `--faint` #8b94a8 → **#656d87** (2.69–3.04:1 → 4.53–5.13:1), light `--p5`
+  #9a7d1f → **#856b1a** (3.48–3.94:1 → 4.51–5.10:1). Dark `--p5` verified fine (8.69–9.75:1,
+  untouched). SCOPE EXTENDED by the axe light run: light `--p1`/`--good` #2e7d5b → **#026e50**
+  (3.91–5.0:1 → 4.81–6.27:1 incl. its own dim chip over page), light `--p2`/`--warn` #8a6d2f →
+  **#725a27** (4.19–5.0:1 → 4.90–6.55:1), light `--p4` #b35a3a → **#a95537** (4.18–5.0:1 →
+  4.59–5.20:1); `--good-dim`/`--warn-dim` literals follow the new inks; dark variants untouched
+  (they pass). Hierarchy kept: faint stays the weakest ink tier (muted ≥5.26:1 light, ≥5.58:1 dark
+  on the same surfaces). Verified per contract — axe-core 4.12.1 on Today + Roadmap + Stats ×
+  both themes: **zero contrast violations in all six passes**; axe's "incomplete" nodes
+  (animated/absolutely-positioned/expanded-hidden pieces) were audited by hand — every flagged ink
+  pair resolves to `--muted`/`--faint`/`--text` at ≥4.5:1 on its real background (e.g. stage-card
+  spans = `--muted` 6.26:1 dark / 5.26:1 light; heatmap month labels = new faint on `--panel`).
+  Screenshots reviewed (fx-ws4-{today,roadmap}-{dark,light}.png + stats): hierarchy intact, no
+  surprise design change; console clean. Gates typecheck ✓ 104/104 ✓ build ✓ (459.39 kB /
+  150.68 gz). Commit: `Design: --faint and light --p5 retuned to 4.5:1 (both themes)`.
