@@ -96,8 +96,8 @@ Every load opens with **The Ignition** — a WebGL electric Forge logo that crac
 ## Development
 
 ```bash
-git clone https://github.com/Farzansayeed/c-learning-roadmap.git
-cd c-learning-roadmap
+git clone https://github.com/Farzansayeed/The-Forge.git
+cd The-Forge
 npm install
 
 npm run dev          # vite dev server
