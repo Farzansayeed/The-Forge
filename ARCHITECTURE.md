@@ -70,16 +70,18 @@ features/    the 8 pages — render only, never compute
 | Add roasts/excuses | `data/roast.ts` (tier 1–5; the intensity dial caps tiers: mild ≤ 2, spicy ≤ 4, nuclear = 5). |
 | Install a React Bits piece | `npx shadcn@latest add @react-bits/<Name>-TS-TW` → lands in `components/bits/` → re-point its colors/fonts to the tokens. |
 
-## Tests map (99 total, `npm test`)
+## Tests map (104 total, `npm test`)
 
 | Suite | Covers |
 |---|---|
 | `engines/*.test.ts` | schedule (leap years, postpones, catch-up interplay), quiz selection/scoring, SM-2 boundaries, dread/streak math, tribunal/bedtime, XP/ranks, progress counts |
+| `lib/schema.test.ts` | `todayKey()` — the one local day key (padding, full-day round-trip near midnight, default-to-now) |
 | `lib/storage.test.ts` | debts to the debouncer, validation fallback with first-wins `.bak` stash of corrupt payloads, failed-write → pending retained + flush retry, export/import round-trip |
 | `lib/v2import.test.ts` | legacy ledger mapping |
 | `data/curriculum/validate.test.ts` | curriculum structure + resource canon hygiene |
 | `data/quizzes/validate.test.ts` | blueprint counts + quiz-ref integrity — the "content gap = red build" guarantee |
 | `app/IntroGate.test.tsx` | the intro lifecycle (timer-based, reduced-motion off-switch) + the "keys after done never resurrect the overlay" regression |
+| `stores/daily.test.ts` | day rollover — 30 s poll and visibility-restore both roll the store onto the new local key (fake timers, midday-anchored) |
 
 CI (`.github/workflows/ci.yml`) requires typecheck + tests + build green on every push/PR; `main` auto-deploys to Vercel.
 

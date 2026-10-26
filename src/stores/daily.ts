@@ -108,3 +108,25 @@ export const useDaily = create<DailyStore>((set, get) => {
     },
   };
 });
+
+/* ── Day rollover ─────────────────────────────────────────────
+   A tab left open across midnight (or refocused the next morning
+   without covering the interval tick) must not keep serving
+   yesterday's entry, target and verdict state. Cheap: a string
+   compare every 30 s, plus a check whenever the tab regains
+   visibility. Uses the existing refresh() — one store action. */
+if (typeof window !== 'undefined') {
+  let lastKey = todayKey();
+  const roll = (): void => {
+    const now = todayKey();
+    if (now !== lastKey) {
+      lastKey = now;
+      useDaily.getState().refresh(now);
+    }
+  };
+  const iv = window.setInterval(roll, 30_000);
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible') roll();
+  });
+  void iv; // lives for the app's whole session — like DreadProvider's poller
+}

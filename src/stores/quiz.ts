@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import { loadData, saveData } from '../lib/storage';
 import { isCorrect, quizXp } from '../engines/quiz';
 import { scheduleFailure, scheduleSuccess } from '../engines/spacedReview';
+import { todayKey } from '../lib/schema';
 import type { QuizItem } from '../data/quizzes/types';
 
 /**
@@ -46,7 +47,7 @@ export const useQuiz = create<QuizStore>((set, get) => ({
     set({ results });
 
     const missed = items.filter((it) => !results[it.id]);
-    const today = new Date().toISOString().slice(0, 10);
+    const today = todayKey();
     let earned = 0;
 
     patch((d) => {

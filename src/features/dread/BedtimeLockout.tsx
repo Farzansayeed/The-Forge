@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { AnimatePresence, motion } from 'motion/react';
 import { loadData } from '../../lib/storage';
 import { bedtimeStatus, type BedtimeMode } from '../../engines/accountability';
+import { todayKey } from '../../lib/schema';
 
 /**
  * BedtimeLockout (Phase 6, decision 13):
@@ -21,7 +22,7 @@ async function notifyIfPermitted(bedtime: string): Promise<void> {
   try {
     if (!('Notification' in window) || Notification.permission !== 'granted') return;
     const d = loadData();
-    const today = new Date().toISOString().slice(0, 10);
+    const today = todayKey();
     if (d.days[today]?.verdict) return; // closed — nothing to nag about
     const key = `forge-bedtime-notified-${today}`;
     if (localStorage.getItem(key)) return;
@@ -46,7 +47,7 @@ export function BedtimeLockout() {
     const check = (): void => {
       const d = loadData();
       const now = new Date();
-      const today = now.toISOString().slice(0, 10);
+      const today = todayKey(now); // local calendar — paired with the local bedtime compare below
       const closed = d.days[today]?.verdict !== undefined;
       const s = bedtimeStatus(d.settings.bedtime, now, closed);
       setBedtime(d.settings.bedtime);

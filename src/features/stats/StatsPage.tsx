@@ -2,6 +2,7 @@ import { useMemo } from 'react';
 import { loadData } from '../../lib/storage';
 import { buildSchedule, type DayEntry } from '../../engines/schedule';
 import { studyStreak, consecutiveBadDays, dreadLevel } from '../../engines/dread';
+import { todayKey } from '../../lib/schema';
 import { useWeekReview } from '../dread/TribunalCard';
 
 /**
@@ -227,14 +228,18 @@ function useProjection(today: string) {
     const actualRate = doneItems / elapsed; // topics per day
     const remaining = totalTopics - doneItems;
     const actualDays = actualRate > 0 ? Math.ceil(remaining / actualRate) + elapsed : null;
-    const actualEnd = actualDays ? new Date(start.getTime() + actualDays * 86400000).toISOString().slice(0, 10) : null;
+    // projected end date must use the local calendar (UTC slicing of a
+    // local-midnight date is off by one for every non-UTC user)
+    const actualEnd = actualDays
+      ? todayKey(new Date(start.getFullYear(), start.getMonth(), start.getDate() + actualDays))
+      : null;
 
     return { plannedEnd, actualEnd, doneItems, totalTopics, elapsed };
   }, [today]);
 }
 
 export function StatsPage() {
-  const today = new Date().toISOString().slice(0, 10);
+  const today = todayKey();
   const econ = useEconomy(today);
   const proj = useProjection(today);
   const data = loadData();

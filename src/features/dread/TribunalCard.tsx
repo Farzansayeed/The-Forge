@@ -2,6 +2,7 @@ import { useMemo } from 'react';
 import { loadData } from '../../lib/storage';
 import { buildSchedule } from '../../engines/schedule';
 import { tribunalStamp } from '../../engines/accountability';
+import { todayKey } from '../../lib/schema';
 
 /**
  * TribunalCard — the Sunday Tribunal (Phase 6).
@@ -85,7 +86,7 @@ export function useWeekReview(today: string): { days: WeekDay[]; stamp: ReturnTy
 }
 
 export function TribunalCard({ compact = false }: { compact?: boolean }) {
-  const { days, stamp, scheduledDays } = useWeekReview(new Date().toISOString().slice(0, 10));
+  const { days, stamp, scheduledDays } = useWeekReview(todayKey());
 
   const sealed =
     stamp.id === 'flawless'

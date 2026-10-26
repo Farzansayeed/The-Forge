@@ -91,14 +91,18 @@ carries the plan, the rules, the environment quirks, and the status ledger. Upda
 - **Commit:** `Storage: never clobber corrupt state, keep pending work on write failure`
 
 ### WS3 · One local day key everywhere `[🟠 correctness]`
-- First move `todayKey()` (from `src/stores/daily.ts:4,14`) to `src/lib/dates.ts` (check import graph
-  for cycles first) and swap these UTC-day sites to it:
-  `RoastOverlay.tsx:29`, `DreadProvider.tsx:15`, `BedtimeLockout.tsx:24,49`, `TodayPage.tsx:445`,
-  `StatsPage.tsx:237`, `TribunalCard.tsx:88`, `quiz.ts:49`, `ArenaPage.tsx:89`.
-- Add midnight rollover to `useDaily` (`daily.ts:105`): on `visibilitychange` (visible) + a ≤60 s
-  clock check comparing `todayKey()` against the store's current key → call existing `refresh()`.
-- Tests: date helper unit tests (UTC-/local crossing via fixed-offset ISO path is not runtime-
-  fakeable simply — cover `todayKey()` correctness + the rollover effect with vitest fake timers).
+- CORRECTED during execution: `todayKey()` was never in `daily.ts` — it already lives at
+  `src/lib/schema.ts:93` (the audit ref'd the *import* at `daily.ts:4,14`), so no `lib/dates.ts`
+  was created. Swapped all 10 UTC-day sites to it: `RoastOverlay.tsx:29`, `DreadProvider.tsx:15`,
+  `BedtimeLockout.tsx` ×2, `TodayPage.tsx` (roast line), `StatsPage.tsx:237` **plus
+  `StatsPage.tsx:230`** (projection end-date — a 10th same-class site found during execution),
+  `TribunalCard.tsx:88`, `quiz.ts:49`, `ArenaPage.tsx:89`.
+- Midnight rollover added at module scope in `daily.ts`: a 30 s interval comparing `todayKey()`
+  against the poller's last key → existing `refresh()`, plus the same check on
+  `visibilitychange` (visible).
+- Tests: `lib/schema.test.ts` (todayKey correctness) + `stores/daily.test.ts` (rollover via fake
+  timers — fake timers installed BEFORE a fresh dynamic import of the store, so the module-scope
+  interval is fake-tracked; dates midday-anchored so no tick crosses midnight inside a test).
 - **Commit:** `Dates: single local day key across dread/tribunal/quiz/arena + midnight rollover`
 
 ### WS4 · WCAG AA contrast retune `[🔴 a11y]`
@@ -253,7 +257,7 @@ Individually small, semantically grouped (one commit):
 |----|-------|--------|--------------|--------|-------|
 | WS1 | verdict-dialog orphan scrim | DONE (blocker retracted → trap hardening + scrim token) | 2026-10-26 | this commit | 94 |
 | WS2 | persistence fail-safety | DONE | 2026-10-26 | this commit | 99 |
-| WS3 | local day key everywhere | TODO | — | — | 94 |
+| WS3 | local day key everywhere | DONE | 2026-10-26 | this commit | 104 |
 | WS4 | WCAG AA contrast | TODO | — | — | 94 |
 | WS5 | MotionConfig reduced motion | TODO | — | — | 94 |
 | WS6 | scroll contract | TODO | — | — | 94 |
@@ -301,3 +305,21 @@ Individually small, semantically grouped (one commit):
   ledger restored byte-identical (299 bytes), `.bak`/temp keys removed, app reloaded clean, console
   clean; gates typecheck ✓ 99/99 ✓ build ✓ (entry 459.32 kB / 150.62 gz). Commit:
   `Storage: never clobber corrupt state, keep pending work on write failure`.
+- 2026-10-26 — **WS3 done.** Plan truth-ups recorded in the WS3 section: `todayKey()` already
+  lived at `src/lib/schema.ts:93` (audit ref'd the import, not the definition — no `lib/dates.ts`);
+  the first swap pass missed `RoastOverlay.tsx:29` (the audit had it right — caught by re-grep
+  before commit) and found a 10th same-class site, `StatsPage.tsx:230` — projection end-date as an
+  ISO slice of a local-midnight date → `todayKey(new Date(y, m, d + actualDays))`. All 10 day-key
+  sites now call `todayKey()`; sweep proves zero remaining `toISOString().slice` day-keys and no
+  `getUTC*` anywhere (remaining `Date.now()` uses are shuffle seeds / elapsed-time math).
+  Rollover: module-scope poller in `daily.ts` — 30 s interval + `visibilitychange`(visible),
+  comparing `todayKey()` to the last key, calling the existing `refresh()`. +5 tests → **104/104**
+  (`lib/schema.test.ts`: padding, full-day round-trip, default; `stores/daily.test.ts`: interval
+  rollover + visibility rollover — fake timers installed before a fresh dynamic import so the
+  module-scope interval is fake-tracked, midday-anchored so no tick crosses midnight). README +
+  ARCHITECTURE counts updated (99 → 104). Verified live (rebuilt dist, agent-browser): Today
+  renders `Monday 26 Oct · STUDY DAY · S00` from the local key with the stack 0/5; Stats renders
+  the projection card (`Planned finish — Jan 19, 2027`); screenshots `fx-ws3-stats2.png` /
+  `fx-ws3-today.png` reviewed; final-build boot re-checked (day stamp + stack + zero console
+  errors); gates typecheck ✓ 104/104 ✓ build ✓ (entry 459.39 kB / 150.68 gz). Commit:
+  `Dates: single local day key across dread/tribunal/quiz/arena + midnight rollover`.

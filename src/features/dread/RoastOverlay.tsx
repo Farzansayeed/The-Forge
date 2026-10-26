@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { AnimatePresence, motion } from 'motion/react';
 import { loadData } from '../../lib/storage';
 import { consecutiveBadDays } from '../../engines/dread';
+import { todayKey } from '../../lib/schema';
 import { pickRoast, pickPraise } from '../../data/roast';
 import { ScrambledText } from './ScrambledText';
 
@@ -26,7 +27,7 @@ export function RoastOverlay() {
 
     const speak = (): void => {
       const d = loadData();
-      const today = new Date().toISOString().slice(0, 10);
+      const today = todayKey(); // the day's record lives under the LOCAL calendar key
       const rec = d.days[today];
       if (!rec?.closedAt || rec.closedAt === lastClosedAt) return;
       const first = lastClosedAt === null && lastVerdict === null;

@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { loadData } from '../../lib/storage';
 import { dreadLevel } from '../../engines/dread';
+import { todayKey } from '../../lib/schema';
 
 /**
  * DreadProvider — mounts once, computes the dread level, and publishes it
@@ -12,7 +13,7 @@ export function DreadProvider() {
   useEffect(() => {
     const apply = (): void => {
       const d = loadData();
-      const today = new Date().toISOString().slice(0, 10);
+      const today = todayKey();
       const level = dreadLevel(d, today);
       document.documentElement.setAttribute('data-dread', String(level));
     };

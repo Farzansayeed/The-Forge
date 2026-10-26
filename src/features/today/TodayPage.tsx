@@ -4,7 +4,7 @@ import { Modal } from '../../components/ui/Modal';
 import { EXCUSES, pickPraise, pickRoast } from '../../data/roast';
 import { consecutiveBadDays } from '../../engines/dread';
 import { loadData } from '../../lib/storage';
-import type { Verdict } from '../../lib/schema';
+import { todayKey, type Verdict } from '../../lib/schema';
 import { useDaily } from '../../stores/daily';
 import { useProgress } from '../../stores/progress';
 import { curriculumItem } from './item';
@@ -442,7 +442,7 @@ function CloseModal({
   const stage = (v: Verdict): void => {
     // The verdict is the user's call — hours are context, never an override.
     setStaged(v);
-    setLine(v === 'pass' ? pickPraise() : pickRoast(roastIntensity, consecutiveBadDays(loadData(), new Date().toISOString().slice(0, 10))).line);
+    setLine(v === 'pass' ? pickPraise() : pickRoast(roastIntensity, consecutiveBadDays(loadData(), todayKey())).line);
     setConfirmingFail(true);
   };
 

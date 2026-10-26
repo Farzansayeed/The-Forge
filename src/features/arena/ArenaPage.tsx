@@ -5,6 +5,7 @@ import { PHASES, stageById } from '../../data/curriculum';
 import { gateStatus } from '../../engines/quiz';
 import { dueCards } from '../../engines/spacedReview';
 import { loadData } from '../../lib/storage';
+import { todayKey } from '../../lib/schema';
 import { useProgress } from '../../stores/progress';
 import { QuizRunner } from './QuizRunner';
 import { btn } from './shared';
@@ -86,7 +87,7 @@ export function ArenaPage() {
   const [, forceTick] = useState(0);
   const checkedIds = useProgress((s) => s.checkedIds);
   const data = useMemo(() => loadData(), [checkedIds, view]);
-  const today = new Date().toISOString().slice(0, 10);
+  const today = todayKey();
   const due = useMemo(() => dueCards(data.review, today), [data, today]);
 
   if (view.kind === 'run') {
