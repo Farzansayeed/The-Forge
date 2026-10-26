@@ -12,7 +12,7 @@ const SHELL_CACHE = `${SW_VERSION}-shell`;
 const ASSET_CACHE = `${SW_VERSION}-assets`;
 const FONT_CACHE = `${SW_VERSION}-fonts`;
 
-const SHELL_URLS = ['/', '/index.html', '/manifest.webmanifest', '/logo.png', '/logo-64.png'];
+const SHELL_URLS = ['/', '/index.html', '/manifest.webmanifest', '/logo.png', '/logo-64.png', '/hammer-anvil.svg'];
 
 self.addEventListener('install', (event) => {
   event.waitUntil(

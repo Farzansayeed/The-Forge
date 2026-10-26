@@ -44,7 +44,7 @@ export function TopBar() {
         }}
       >
         <img
-          src="/logo-64.png"
+          src="/hammer-anvil.svg"
           alt="The Forge logo"
           width={34}
           height={34}

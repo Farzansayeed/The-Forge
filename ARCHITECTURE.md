@@ -45,7 +45,7 @@ features/    the 8 pages — render only, never compute
 | `src/data/roast.ts` | The personality corpus: praise, 5 roast tiers (1=Mild … 5=Nuclear), ghost lines, the valid/invalid excuse lists. |
 | `src/styles/tokens.css` | The whole theme: Terminal (dark, default) + Blueprint (light), phase accents `--p0…--p5`, and the `data-dread` corruption (accents bleed toward danger, grain rises). |
 | `src/test/` | Vitest setup (jsdom, Testing Library). |
-| `public/` | PWA: `manifest.webmanifest`, zero-dependency `sw.js`, `logo.png`-derived icons, `favicon.svg`. |
+| `public/` | PWA: `manifest.webmanifest`, zero-dependency `sw.js`, `hammer-anvil.svg` (app mark + SVG favicon), `logo.png`/`logo-64.png`/`icons/` rasters (WebGL texture, favicon fallback, apple-touch/maskable icons). |
 | `legacy/` | The untouched v2 single-file app (still runnable via `file://`; its ledger imports through Settings). |
 | `practice/` | Local C compiler sanity checks (e.g. `hello.c`). |
 | Root | `index.html` (fonts + SW registration) · `vite.config.ts` (jsdom test config, `--mode single` sandbox build) · `vercel.json` (SPA rewrites) · `.github/workflows/ci.yml` (typecheck → test → build) · `components.json` (shadcn/React Bits config). |
