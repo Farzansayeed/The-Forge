@@ -251,7 +251,7 @@ Individually small, semantically grouped (one commit):
 
 | WS | Scope | Status | Last touched | Commit | Tests |
 |----|-------|--------|--------------|--------|-------|
-| WS1 | verdict-dialog orphan scrim | TODO | — | — | 94 |
+| WS1 | verdict-dialog orphan scrim | DONE (blocker retracted → trap hardening + scrim token) | 2026-10-26 | this commit | 94 |
 | WS2 | persistence fail-safety | TODO | — | — | 94 |
 | WS3 | local day key everywhere | TODO | — | — | 94 |
 | WS4 | WCAG AA contrast | TODO | — | — | 94 |
@@ -271,3 +271,18 @@ Individually small, semantically grouped (one commit):
 
 - 2026-10-26 — Fixplan created (this file) + `AUDIT-2026-10-26.md` committed; main at `8c23daf`;
   94/94 tests green; CI green on `8c23daf`.
+- 2026-10-26 — Planning docs committed as `Docs: 2026-10-26 full audit + prioritized fix plan`
+  (`408d952`).
+- 2026-10-26 — **WS1 done.** Investigation FIRST disproved audit blocker #1: 3 controlled body clicks
+  on the open verdict dialog left the state invariant (`dialogs:1, scrims:1`; content never unmounts
+  without its scrim — Modal is one conditional subtree, `open ? <scrim+dialog> : null`). Original
+  "stuck" state was a legitimately open modal (content visible op=1 in the capture). Audit §1
+  truth-up'd. Real fixes shipped in the same component: Modal trap effect deps `[open,onClose]`→
+  `[open]` with callback read via ref (inline `onClose` identities no longer churn the keydown trap +
+  focus juggling on parent re-render), and hardcoded `rgba(4,6,10,0.6)` scrim → `var(--scrim)`
+  (terminal: shipped value verbatim; blueprint: ink veil `rgba(26,34,51,0.35)`). Verified live
+  (agent-browser, rebuilt dist): paths A scrim-ring tap / B Esc (focus restored to trigger) /
+  C confirm button all leave 0 dialogs + 0 fixed scrims in BOTH themes; screenshots
+  `fx-ws1-verdict-{dark,light}.png`; console clean; typecheck ✓; 94/94 ✓; build ✓
+  (entry 459.06 kB / 150.52 gz). Commit: `Modal: harden trap lifecycle, theme-native scrim;
+  audit blocker #1 corrected`.

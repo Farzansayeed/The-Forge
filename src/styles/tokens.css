@@ -23,6 +23,9 @@
   --muted: #8b93a3;
   --faint: #5c6473;
 
+  /* modal veil */
+  --scrim: rgba(4, 6, 10, 0.6);
+
   /* semantic */
   --good: #6fbf9a;
   --good-dim: rgba(111, 191, 154, 0.14);
@@ -66,6 +69,9 @@
   --text: #1a2233;
   --muted: #5a6478;
   --faint: #8b94a8;
+
+  /* modal veil — ink-tinted for the blueprint page */
+  --scrim: rgba(26, 34, 51, 0.35);
 
   --good: #2e7d5b;
   --good-dim: rgba(46, 125, 91, 0.1);

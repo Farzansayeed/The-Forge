@@ -14,10 +14,22 @@ const FOCUSABLE =
 /**
  * Base modal — U8 from day one: focus trap, Esc to close,
  * focus restored to the trigger on close.
+ *
+ * All four call sites pass inline `onClose` arrows whose identity changes on
+ * every parent render, so the trap effect must not list `onClose` as a
+ * dependency — that used to tear down + reinstall the keydown listener and
+ * re-run focus juggling each time. The callback is read through a ref at
+ * event time; scrim and dialog are one conditional subtree and unmount
+ * together, always.
  */
 export function Modal({ open, onClose, label, children, width = 440 }: ModalProps) {
   const boxRef = useRef<HTMLDivElement>(null);
   const restoreRef = useRef<HTMLElement | null>(null);
+  const onCloseRef = useRef(onClose);
+
+  useEffect(() => {
+    onCloseRef.current = onClose;
+  });
 
   useEffect(() => {
     if (!open) return;
@@ -30,7 +42,7 @@ export function Modal({ open, onClose, label, children, width = 440 }: ModalProp
     const onKey = (e: KeyboardEvent): void => {
       if (e.key === 'Escape') {
         e.stopPropagation();
-        onClose();
+        onCloseRef.current();
         return;
       }
       if (e.key !== 'Tab' || !box) return;
@@ -51,7 +63,7 @@ export function Modal({ open, onClose, label, children, width = 440 }: ModalProp
       document.removeEventListener('keydown', onKey);
       restoreRef.current?.focus();
     };
-  }, [open, onClose]);
+  }, [open]);
 
   if (!open) return null;
 
@@ -67,7 +79,7 @@ export function Modal({ open, onClose, label, children, width = 440 }: ModalProp
         zIndex: 90,
         display: 'grid',
         placeItems: 'center',
-        background: 'rgba(4, 6, 10, 0.6)',
+        background: 'var(--scrim)',
         padding: 20,
       }}
     >
