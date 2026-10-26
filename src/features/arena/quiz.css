@@ -1,0 +1,11 @@
+/* WS7: boss-quiz sticky header chrome.
+   On narrow screens the runner header keeps its critical one-liner —
+   "← Leave quiz · FORMAT · idx/total" — while the decorative set title and
+   the mini progress bar yield (title and progress both restate on the hub
+   card and the result screen; the counter is the live progress signal). */
+@media (max-width: 600px) {
+  .quiz-chrome-title,
+  .quiz-chrome-progress {
+    display: none;
+  }
+}

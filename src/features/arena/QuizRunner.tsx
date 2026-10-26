@@ -1,14 +1,35 @@
-import { useMemo, useState } from 'react';
+import { useLayoutEffect, useMemo, useState } from 'react';
 import { isCorrect, selectItems, score, type Answered } from '../../engines/quiz';
 import type { QuizItem, QuizSet } from '../../data/quizzes/types';
 import { useQuiz } from '../../stores/quiz';
 import { btn, FORMAT_TAG } from './shared';
 import { QuizItemView } from './renderers';
+import './quiz.css';
 
 /**
  * QuizRunner — one item at a time, instant feedback (DESIGN.md §4),
  * commit on finish (XP + spaced-review routing), re-rolled retry on fail.
  */
+
+/**
+ * Height of the app-shell topbar (sticky: brand row 56 + nav row) — measured,
+ * not hardcoded, so typography/zoom changes can't open a seam under it.
+ * TopBar is the first <header> in document order (route pages render after
+ * the shell), and ResizeObserver keeps the offset live.
+ */
+function useTopbarHeight(): number {
+  const [h, setH] = useState(0);
+  useLayoutEffect(() => {
+    const el = document.querySelector('header');
+    if (!el) return;
+    const update = (): void => setH(el.getBoundingClientRect().height);
+    update();
+    const ro = new ResizeObserver(update);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
+  return h;
+}
 
 interface RunResult {
   pct: number;
@@ -25,6 +46,7 @@ export function QuizRunner({ set, onExit }: { set: QuizSet; onExit: () => void }
   const [idx, setIdx] = useState(0);
   const [checked, setChecked] = useState<Record<string, boolean>>({});
   const [result, setResult] = useState<RunResult | null>(null);
+  const topbarH = useTopbarHeight();
 
   const item = ordered[idx];
   const answers = useQuiz((s) => s.answers);
@@ -122,27 +144,80 @@ export function QuizRunner({ set, onExit }: { set: QuizSet; onExit: () => void }
   }
 
   return (
-    <div style={{ maxWidth: 760, display: 'grid', gap: 18 }}>
-      <div style={{ display: 'flex', alignItems: 'baseline', gap: 12 }}>
-        <button type="button" style={{ ...btn('ghost'), padding: '6px 12px' }} onClick={onExit} aria-label="Leave quiz">
-          ←
+    /* Flex column, not grid: sticky children only stick within their own grid
+       area, so a grid wrapper would trap the header row. As a flex child its
+       containing block is the whole runner — it can travel over the tall
+       question card (WS7). */
+    <div style={{ maxWidth: 760, display: 'flex', flexDirection: 'column', gap: 18 }}>
+      {/* WS7: quiz chrome stays visible under the topbar while long questions
+          scroll. Top offset tracks the shell topbar (z 50); this row sits at
+          z 40 with an opaque page background so content never bleeds through. */}
+      <div
+        style={{
+          position: 'sticky',
+          top: topbarH,
+          zIndex: 40,
+          display: 'flex',
+          alignItems: 'center',
+          gap: 12,
+          background: 'var(--bg)',
+          borderBottom: '1px solid var(--border)',
+          padding: '10px 0',
+        }}
+      >
+        <button
+          type="button"
+          style={{ ...btn('ghost'), padding: '6px 12px', whiteSpace: 'nowrap' }}
+          onClick={onExit}
+        >
+          ← Leave quiz
         </button>
-        <div>
-          <div className="mono" style={{ fontSize: 10.5, letterSpacing: 2, color: 'var(--faint)' }}>
+        <div style={{ minWidth: 0 }}>
+          <div
+            className="quiz-chrome-title mono"
+            style={{
+              fontSize: 10.5,
+              letterSpacing: 2,
+              color: 'var(--faint)',
+              whiteSpace: 'nowrap',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+            }}
+          >
             {set.title}
           </div>
-          <div className="mono" style={{ fontSize: 12, color: 'var(--info)', marginTop: 3, letterSpacing: 1.5 }}>
+          <div
+            className="mono"
+            style={{
+              fontSize: 12,
+              color: 'var(--info)',
+              marginTop: 3,
+              letterSpacing: 1.5,
+              whiteSpace: 'nowrap',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+            }}
+          >
             {FORMAT_TAG[item.format]} · {idx + 1}/{ordered.length}
             {checked[item.id] === true ? ' · ✓ so far' : ''}
           </div>
         </div>
         <div
+          className="quiz-chrome-progress"
           role="progressbar"
           aria-valuenow={Math.round((answeredCount / ordered.length) * 100)}
           aria-valuemin={0}
           aria-valuemax={100}
           aria-label="Quiz progress"
-          style={{ marginLeft: 'auto', width: 120, height: 6, borderRadius: 99, background: 'var(--panel2)', border: '1px solid var(--border)' }}
+          style={{
+            marginLeft: 'auto',
+            flex: 'none',
+            width: 120,
+            height: 6,
+            borderRadius: 99,
+            background: 'var(--panel2)',
+            border: '1px solid var(--border)',
+          }}
         >
           <div
             style={{

@@ -265,7 +265,7 @@ Individually small, semantically grouped (one commit):
 | WS4 | WCAG AA contrast | DONE (scope extended: 6 tokens) | 2026-10-26 | this commit | 104 |
 | WS5 | MotionConfig reduced motion | DONE | 2026-10-26 | this commit | 104 |
 | WS6 | scroll contract | DONE | 2026-10-26 | this commit | 104 |
-| WS7 | quiz chrome sticky | TODO | — | — | 94 |
+| WS7 | quiz chrome sticky | DONE (scope +1: mobile chrome row) | 2026-10-26 | this commit | 104 |
 | WS8 | SW hardening + versioning | TODO | — | — | 94 |
 | WS9 | timer survives reload | TODO | — | — | 94 |
 | WS10 | shared Button states | TODO | — | — | 94 |
@@ -371,3 +371,27 @@ Individually small, semantically grouped (one commit):
   (native restoration, untouched). Console clean. Gates typecheck ✓ 104/104 ✓ build ✓ (entry
   460.00 kB / 150.92 gz, +0.24 kB). Commit: `Nav: scroll-to-top on route push (deep-link hashes
   preserved)`.
+- 2026-10-26 — **WS7 done.** Boss-quiz chrome stays reachable: the runner header row (leave ·
+  title · format+index counter · mini progress) is now `position: sticky` below the topbar —
+  offset **measured live** via `useTopbarHeight()` (ResizeObserver keeps it fresh; topbar is the
+  first `<header>` in document order; measured 93px = brand 56 + nav row), opaque `var(--bg)` +
+  hairline bottom border at z 40 under the shell's z 50. Two structural truths worth recording:
+  (1) the wrapper had to switch grid → flex column — sticky **grid** children only stick within
+  their own grid area, so the original layout would have silently trapped the header; as a flex
+  child its containing block is the whole runner; (2) `selectItems` shuffles with `Date.now()`,
+  so no question has a fixed position — the contract's "Q2 Find-the-Bug" was verified on the
+  actual tall items wherever they landed (FIND THE BUG appeared as Q2 in this session anyway).
+  Progress interplay: the progress indicator is part of the header row itself (no separate dots
+  exist in the runner), so it rides along. "Leave quiz" is now visible text (`← Leave quiz`,
+  no redundant aria-label). SCOPE +1: mobile pass (Playwright, real 390×844 and iPhone SE
+  375×667 viewports — agent-browser's `viewport` subcommand also doesn't exist in this build)
+  showed the row cramped at 390px: title wrapped 3 lines; new co-located `quiz.css` hides the
+  decorative title + mini progress ≤600px (both restate on the hub card and result screen; the
+  format·index counter stays) → one clean line on phones. Verified live on rebuilt dist:
+  desktop — graded Q2 (find-bug, 9 code lines) scrolled to max 310/310 with the WHY panel
+  expanded → sticky row pinned at exactly 93 = topbar bottom, Leave visible and **clicked from
+  the bottom** returning to the hub (20 Enter cards); console clean; screenshots
+  fx-ws7-quiz-{top,bottom,mobile,mobile-se}.png reviewed — SE geometry: 341/341 scrolled, row
+  pinned at 93, no horizontal overflow, single-line chrome. Gates typecheck ✓ 104/104 ✓ build ✓
+  (460.03 kB / 150.93 gz, +0.03 kB). Commit: `Arena: quiz title/back/leave stay sticky over long
+  questions`.
