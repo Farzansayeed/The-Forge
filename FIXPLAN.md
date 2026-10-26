@@ -266,7 +266,7 @@ Individually small, semantically grouped (one commit):
 | WS5 | MotionConfig reduced motion | DONE | 2026-10-26 | this commit | 104 |
 | WS6 | scroll contract | DONE | 2026-10-26 | this commit | 104 |
 | WS7 | quiz chrome sticky | DONE (scope +1: mobile chrome row) | 2026-10-26 | this commit | 104 |
-| WS8 | SW hardening + versioning | TODO | — | — | 94 |
+| WS8 | SW hardening + versioning | DONE (scope +1: asset-manifest precache) | 2026-10-26 | this commit | 104 |
 | WS9 | timer survives reload | TODO | — | — | 94 |
 | WS10 | shared Button states | TODO | — | — | 94 |
 | WS11 | docs truth-up + dead code | TODO | — | — | 94 |
@@ -395,3 +395,29 @@ Individually small, semantically grouped (one commit):
   pinned at 93, no horizontal overflow, single-line chrome. Gates typecheck ✓ 104/104 ✓ build ✓
   (460.03 kB / 150.93 gz, +0.03 kB). Commit: `Arena: quiz title/back/leave stay sticky over long
   questions`.
+- 2026-10-26 — **WS8 done.** PWA hardening. (a) Cache pruning keyed to a build-injected version:
+  sw.js now reads `__BUILD_ID__` under a `forge-` cache prefix, activate() prunes every
+  `forge-*` cache that isn't one of the three live shelves (shell/assets/fonts) — cross-tenant
+  names are left alone; vite.config.ts gained a closeBundle stamp plugin that fills the id AND
+  injects the full `/assets/` manifest as a precache list (build twice → distinct ids verified:
+  e.g. `mvpivz1g` vs `mvpiwbbn`; no leftovers in dist). (b) SWR background revalidate is now
+  `event.waitUntil(...)`-wrapped (asset handler serving a hit, and the navigation shell
+  refresh), so the SW can't die mid-cache.put. (c) Navigations already network-first — kept.
+  Registration (index.html) now fires for https OR localhost/127.0.0.1 with `.catch(console.warn)`
+  — gated by a dev sentinel (`script[src^="/src/"]` exists only on the raw dev server) so vite
+  dev with HMR never registers. Live verify (Playwright + vite preview): real two-generation
+  deploy simulated — visit gen A (controlled ✓), seed legacy `forge-v1-shell` + old-gen orphan +
+  cross-tenant cache, swap dist/sw.js id to gen B, `registration.update()` (the devtools
+  Update-check equivalent — plain reloads are silent because Chromium throttles navigation
+  update checks ~24h, recorded), activate pruned BOTH junk shelves and gen A's three, kept the
+  cross-tenant cache, fresh gen B caches rebuilt. Offline reload after the upgrade without any
+  fresh online visit renders the full app (network-first navigation falls back to the cached
+  shell; precached chunk set mounts it; only external Google Fonts resources fail — cosmetic).
+  SCOPE +1 found the hard way: pruning the old generation's asset cache leaves upgrade-time
+  offline users with a shell that can't mount (measured: bodyLen 0, ERR_FAILED on hashed
+  chunks) — hence the complete build-manifest precache at install; and a `Vary: Origin`
+  mismatch (preview/sirv stamps it on assets; warmed keys lacked Origin) broke offline match —
+  matches now `{ ignoreVary: true }` (3 sites), same-origin assets make the variance
+  meaningless. Gates typecheck ✓ 104/104 ✓ build ✓ (entry 460.03 kB / 150.93 gz — unbundled
+  file). Commit: `PWA: build-injected SW version, full cache pruning, awaited revalidate,
+  localhost registration`.

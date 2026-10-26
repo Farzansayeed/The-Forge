@@ -21,10 +21,18 @@
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
     <script>
-      // PWA: register the offline worker (production only — dev never caches).
-      if ('serviceWorker' in navigator && location.protocol === 'https:') {
+      // PWA: register the offline worker (production + local preview only —
+      // the raw dev server never caches, its /src/ scripts + HMR ws would).
+      // The dev sentinel: a built page loads hashed /assets/*, not /src/*.
+      if (
+        'serviceWorker' in navigator &&
+        (location.protocol === 'https:' ||
+          location.hostname === 'localhost' ||
+          location.hostname === '127.0.0.1') &&
+        !document.querySelector('script[type="module"][src^="/src/"]')
+      ) {
         window.addEventListener('load', function () {
-          navigator.serviceWorker.register('/sw.js').catch(function () {});
+          navigator.serviceWorker.register('/sw.js').catch(console.warn);
         });
       }
     </script>
