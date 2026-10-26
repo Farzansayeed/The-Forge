@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { render, screen, fireEvent, act } from '@testing-library/react';
+import { render, screen, fireEvent, act, type RenderResult } from '@testing-library/react';
+import type { ReactNode } from 'react';
 import { IntroGate } from './IntroGate';
 
 /**
@@ -55,25 +56,28 @@ vi.mock('../components/ElectricLogo/ElectricLogo', () => ({
   default: () => <div data-testid="electric-logo-stub" />,
 }));
 
+// The ElectricLogo module is imported lazily now; a plain render() lets the
+// suspended chunk resolve after the test body ends, which React reports as a
+// "not wrapped in act(...)" afterglow. Rendering under act keeps the console clean.
+async function renderIntro(children: ReactNode): Promise<RenderResult> {
+  let result!: RenderResult;
+  await act(async () => {
+    result = render(<IntroGate>{children}</IntroGate>);
+  });
+  return result;
+}
+
 describe('IntroGate', () => {
-  it('renders children immediately underneath the intro', () => {
-    render(
-      <IntroGate>
-        <div>site-content</div>
-      </IntroGate>,
-    );
+  it('renders children immediately underneath the intro', async () => {
+    await renderIntro(<div>site-content</div>);
     expect(screen.getByText('site-content')).toBeTruthy();
     expect(document.querySelector('.forge-intro')).toBeTruthy();
     expect(document.querySelector('.forge-intro')?.getAttribute('data-phase')).toBe('hold');
     expect(document.documentElement.hasAttribute('data-intro')).toBe(true);
   });
 
-  it('plays hold → open → done on the timers, then unmounts', () => {
-    render(
-      <IntroGate>
-        <div>site-content</div>
-      </IntroGate>,
-    );
+  it('plays hold → open → done on the timers, then unmounts', async () => {
+    await renderIntro(<div>site-content</div>);
     act(() => {
       vi.advanceTimersByTime(1000);
     });
@@ -90,12 +94,8 @@ describe('IntroGate', () => {
     expect(screen.getByText('site-content')).toBeTruthy();
   });
 
-  it('clicking the overlay skips straight to open and it still unmounts', () => {
-    render(
-      <IntroGate>
-        <div>site-content</div>
-      </IntroGate>,
-    );
+  it('clicking the overlay skips straight to open and it still unmounts', async () => {
+    await renderIntro(<div>site-content</div>);
     act(() => {
       fireEvent.click(document.querySelector('.forge-intro') as HTMLElement);
     });
@@ -106,28 +106,37 @@ describe('IntroGate', () => {
     expect(document.querySelector('.forge-intro')).toBeNull();
   });
 
-  it('pressing any key skips the intro', () => {
-    render(
-      <IntroGate>
-        <div>site-content</div>
-      </IntroGate>,
-    );
+  it('pressing any key skips the intro', async () => {
+    await renderIntro(<div>site-content</div>);
     act(() => {
       fireEvent.keyDown(window, { key: 'Enter' });
     });
     expect(document.querySelector('.forge-intro')?.getAttribute('data-phase')).toBe('open');
   });
 
-  it('reduced motion: no overlay ever, children shown', () => {
+  it('keys after done never resurrect the overlay (palette-era regression)', async () => {
+    // The gate outlives its overlay, and every keystroke in normal use
+    // (Ctrl+K, palette typing) used to re-invoke the global skip listener
+    // and remount an invisible, click-blocking cover over the whole app.
+    await renderIntro(<div>site-content</div>);
+    act(() => {
+      vi.advanceTimersByTime(3000); // full timeline: hold → open → done
+    });
+    expect(document.querySelector('.forge-intro')).toBeNull();
+    for (const keys of [{ ctrlKey: true }, { key: 'a' }, { key: 'Escape' }]) {
+      fireEvent.keyDown(window, keys);
+      expect(document.querySelector('.forge-intro')).toBeNull();
+    }
+    expect(screen.getByText('site-content')).toBeTruthy();
+    expect(document.documentElement.hasAttribute('data-intro')).toBe(false);
+  });
+
+  it('reduced motion: no overlay ever, children shown', async () => {
     vi.stubGlobal(
       'matchMedia',
       vi.fn().mockReturnValue({ matches: true, addEventListener: vi.fn(), removeEventListener: vi.fn() }),
     );
-    render(
-      <IntroGate>
-        <div>site-content</div>
-      </IntroGate>,
-    );
+    await renderIntro(<div>site-content</div>);
     expect(document.querySelector('.forge-intro')).toBeNull();
     expect(screen.getByText('site-content')).toBeTruthy();
     expect(document.documentElement.hasAttribute('data-intro')).toBe(false);
