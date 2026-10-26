@@ -137,7 +137,8 @@
 
 **Building**
 1. **WASM spike, timeboxed:** clang/wasi toolchain lazy-loaded from CDN on first fix-code open; accept per DESIGN §7 bar (hello-world + malloc + stdio, cold load < 15s, no CORS pain) → upgrade fix-code to embedded editor; else deep-link mode confirmed permanent
-2. Author P3–P5 content: S07 ×12 · S08 ×22 · S09 ×16 · S10 ×22 · S11 ×20 · S12 ×20 · S13 ×14 · S14 ×16 · S15 ×12 · S16 ×18 · S17 ×8 = **180 items** + Boss 3–4 (50 items)
+2. Author P3–P5 content: S07 ×12 · S08 ×22 · S09 ×16 · S10 ×18 · S11 ×24 · S12 ×20 · S13 ×16 · S14 ×14 · S15 ×12 · S16 ×18 · S17 ×8 = **180 items** + Boss 3–4 (50 items)
+   *(split reconciled with the shipped `src/data/quizzes/blueprint.ts` — S10/S11 and S13/S14 were rebalanced during authoring; the 180 total never changed)*
 3. v2 importer: parser + best-effort mapper + tests (Settings-invoked only, decision 6)
 4. Full PWA: manifest, hammer/anvil icons, service worker (offline), installable
 5. Diagnostics page: engine self-tests + data validators runnable in-app (Guardian's spirit, final form)
@@ -145,6 +146,8 @@
 
 **Gate:** everything above + full-app regression across all 3 viewports and both themes + live-production smoke test on the Vercel URL.
 **Commit:** `Phase 8: wasm decision, remaining quizzes (230), PWA, v2 importer, deploy`
+
+**Outcome (reconciled post-ship, 2026):** the WASM spike was **not** built — timeboxing won, and the already-designed deep-link fallback shipped as the permanent fix-code mode (pre-filled OnlineGDB/Programiz + honor-system confirm; recorded as DESIGN.md decision 17). Everything else in this phase shipped as planned; the quiz counts above now match `blueprint.ts` exactly.
 
 ---
 

@@ -88,7 +88,7 @@ Every load opens with **The Ignition** — a WebGL electric Forge logo that crac
 | State | zustand stores (daily, quiz, progress, settings) |
 | Animation | framer-motion + lenis smooth scroll |
 | Routing | react-router-dom v6 (SPA with Vercel rewrite) |
-| Testing | Vitest + jsdom + Testing Library — **88 tests** including the blueprint validator and the v2 importer |
+| Testing | Vitest + jsdom + Testing Library — **94 tests** including the blueprint validator and the v2 importer |
 | Persistence | localStorage (schema v4) + JSON export/import + v2 migration |
 | PWA | `manifest.webmanifest` + zero-dependency service worker |
 | CI | GitHub Actions — typecheck, tests, and build on every push |
@@ -101,12 +101,14 @@ cd c-learning-roadmap
 npm install
 
 npm run dev          # vite dev server
-npm test             # vitest run (88 tests)
+npm test             # vitest run (94 tests)
 npm run typecheck    # tsc --noEmit
 npm run build        # typecheck + production build
 npm run preview      # serve the production build locally
 npm run build:single # single-file sandbox build
 ```
+
+New to the codebase? **[ARCHITECTURE.md](ARCHITECTURE.md)** maps every directory, the data flow (`data → engines → stores → storage`), and where each kind of change belongs.
 
 ## Project status
 

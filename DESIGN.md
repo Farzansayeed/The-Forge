@@ -218,6 +218,8 @@ Install the **TS-TW variant** of components via shadcn CLI (`npx shadcn@latest a
 
 Goal: `fix-code` items run in a browser editor. Try: wasm-clang/wasi toolchain from CDN, lazy-loaded on first fix-code open (~20–30MB, cached by PWA). Accept if: hello-world + malloc/free + stdio work, cold load < 15s on broadband, no CORS issues from Vercel. Fail → `fix-code` renders pre-filled deep links (Programiz/OnlineGDB) with an "I made the tests pass" honor confirm. **Data model already supports both** (§3.2) — zero rework either way.
 
+**Outcome (reconciled post-ship, decision 17):** the spike was never built — the timebox wasn't worth it, and fix-code ships permanently in the deep-link mode above. Reopen this only if the WASM toolchains become trivially embeddable; no data-model rework is needed either way.
+
 ## 8 · Testing & CI
 
 - **Engines:** exhaustive unit tests (schedule edge cases: leap years, postponed chains, catchup+ghost interplay; SM-2 boundary values; gate math).
@@ -259,3 +261,4 @@ Parallel tracks are possible (2 & 3 in one sitting; 5 & 6 in one sitting).
 14. **Streak visibility:** topbar, always visible (v2-style ambient pressure)
 15. **UX audit (UXAUDIT.md):** all 15 requirements **U1–U15 accepted** — routed Today-first IA, collapsed stages, mobile repairs (single-row hours, 56px topbar, scrollable heatmap), dark-first contrast retune, regrouped postpone flow, focus traps/Esc, journaled timer, debounced saves, designed empty states, Reset isolation, a11y fixes
 16. **Smooth scroll:** Lenis adopted (reduced-motion aware); Barba rejected in favor of AnimatePresence route transitions
+17. **Fix-code execution (post-ship):** WASM spike not pursued — deep-link mode (pre-filled OnlineGDB/Programiz + honor confirm) is permanent; see §7 outcome
