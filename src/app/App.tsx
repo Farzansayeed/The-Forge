@@ -1,9 +1,9 @@
 import { lazy, Suspense, useEffect, useState } from 'react';
-import { NavLink, Route, Routes, useLocation } from 'react-router-dom';
+import { NavLink, Route, Routes, useLocation, useNavigationType } from 'react-router-dom';
 import { AnimatePresence, motion, MotionConfig } from 'motion/react';
 import { TopBar } from './TopBar';
 import { ErrorBoundary } from './ErrorBoundary';
-import { useLenis } from './useLenis';
+import { scrollToTop, useLenis } from './useLenis';
 import { Modal } from '../components/ui/Modal';
 import { DreadProvider } from '../features/dread/DreadProvider';
 import { RoastOverlay } from '../features/dread/RoastOverlay';
@@ -150,8 +150,19 @@ function Stub({ title, note }: { title: string; note: string }) {
 export default function App() {
   useLenis();
   const location = useLocation();
+  const navigationType = useNavigationType();
   const [onboard] = useState(() => needsOnboarding());
   const [paletteOpen, setPaletteOpen] = useState(false);
+
+  // Scroll contract: PUSH navigations land at the top; back/forward (POP)
+  // keep the browser's behavior; hash-bearing URLs are left to their anchor
+  // (no hash routing ships today — fix-code deep-links use query params,
+  // DESIGN decision 17 — the guard is future-proofing, not cosmetics).
+  useEffect(() => {
+    if (navigationType !== 'PUSH') return;
+    if (location.hash) return;
+    scrollToTop();
+  }, [location.pathname, location.hash, navigationType]);
 
   // Ctrl+K / ⌘K — global and eager; the palette component itself mounts on demand.
   useEffect(() => {

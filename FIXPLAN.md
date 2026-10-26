@@ -264,7 +264,7 @@ Individually small, semantically grouped (one commit):
 | WS3 | local day key everywhere | DONE | 2026-10-26 | this commit | 104 |
 | WS4 | WCAG AA contrast | DONE (scope extended: 6 tokens) | 2026-10-26 | this commit | 104 |
 | WS5 | MotionConfig reduced motion | DONE | 2026-10-26 | this commit | 104 |
-| WS6 | scroll contract | TODO | — | — | 94 |
+| WS6 | scroll contract | DONE | 2026-10-26 | this commit | 104 |
 | WS7 | quiz chrome sticky | TODO | — | — | 94 |
 | WS8 | SW hardening + versioning | TODO | — | — | 94 |
 | WS9 | timer survives reload | TODO | — | — | 94 |
@@ -357,3 +357,17 @@ Individually small, semantically grouped (one commit):
   Gates typecheck ✓ 104/104 ✓ build ✓ (entry 459.76 kB / 150.81 gz, +0.37 kB for the wrapper).
   Emulation dev-logs: two Playwright runs (`reduced_motion` context), console clean. Commit:
   `Motion: honor prefers-reduced-motion in the engine (MotionConfig)`.
+- 2026-10-26 — **WS6 done.** Scroll contract: PUSH navigations reset to top, POP keeps the
+  browser's behavior, hash-bearing URLs skip the reset. Implementation: `useLenis.ts` now holds
+  the live Lenis instance and exports `scrollToTop()` — programmatic resets go through Lenis's own
+  target (`scrollTo(0, { immediate: true })`, avoiding the bare-`window.scrollTo`-fights-Lenis
+  snap-back class) with a native fallback for reduced-motion sessions; `App.tsx` runs an effect on
+  `location.pathname + hash + useNavigationType()` that resets only on PUSH. Plan truth-up: the
+  audit's "roadmap deep-link mode (misref'd as DESIGN decision 17)" turned out to be hash-free —
+  no hash anchoring exists anywhere today (fix-code deep-links are query-param based; decision 17
+  is the WASM-runner outcome note), so the hash guard is future-proofing, recorded as such.
+  Verified live (rebuilt dist, agent-browser): Today scrolled to 542 via Lenis wheel inertia →
+  PUSH Arena → `scrollY = 0` on `/arena`; `history.back()` → POP restored Today to exactly **542**
+  (native restoration, untouched). Console clean. Gates typecheck ✓ 104/104 ✓ build ✓ (entry
+  460.00 kB / 150.92 gz, +0.24 kB). Commit: `Nav: scroll-to-top on route push (deep-link hashes
+  preserved)`.
