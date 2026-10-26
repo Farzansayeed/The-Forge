@@ -3,11 +3,14 @@ import { useNavigate } from 'react-router-dom';
 import { Modal } from '../components/ui/Modal';
 import { STAGES, PHASES } from '../data/curriculum';
 import { QUIZ_SETS } from '../data/quizzes';
+import { useSettings } from '../stores/settings';
 
 /**
- * CommandPalette (Phase 7) — Ctrl+K / ⌘K opens; fuzzy-filter across pages,
- * stages, quiz sets, and quick actions. Keyboard-first: ↑↓ move, Enter run,
- * Esc close (the Modal owns focus trapping, U8).
+ * CommandPalette (Phase 7) — fuzzy-filter across pages, stages, quiz sets, and
+ * quick actions. Keyboard-first: ↑↓ move, Enter run, Esc close (the Modal owns
+ * focus trapping, U8). The Ctrl+K / ⌘K hotkey lives in App, which mounts this
+ * component only while open — code-split so the quiz registry behind it never
+ * lands in the entry chunk.
  */
 
 interface Command {
@@ -29,17 +32,19 @@ function score(query: string, text: string): number {
   return i === q.length ? 1 : 0;
 }
 
-export function CommandPalette() {
-  const [open, setOpen] = useState(false);
+export function CommandPalette({ onClose }: { onClose: () => void }) {
   const [query, setQuery] = useState('');
   const [idx, setIdx] = useState(0);
   const navigate = useNavigate();
   const listRef = useRef<HTMLUListElement>(null);
 
+  /* The Ctrl+K hotkey lives in App (eager); this component is code-split and
+   * mounted only while open, so importing the full quiz registry here never
+   * touches the entry chunk. */
   const commands = useMemo<Command[]>(() => {
     const nav = (path: string) => () => {
       navigate(path);
-      setOpen(false);
+      onClose();
     };
     const cmds: Command[] = [
       { id: 'nav.today', label: 'Go to Today', hint: 'page', keywords: 'home daily stack', run: nav('/') },
@@ -54,10 +59,12 @@ export function CommandPalette() {
         label: 'Toggle theme',
         hint: 'action',
         keywords: 'dark light terminal blueprint',
+        // Through the store, never a hand-rolled attribute flip — the store
+        // persists the choice to cdr-v3, which a raw setAttribute would lose
+        // on the next reload.
         run: () => {
-          const el = document.documentElement;
-          el.setAttribute('data-theme', el.getAttribute('data-theme') === 'blueprint' ? 'terminal' : 'blueprint');
-          setOpen(false);
+          useSettings.getState().toggleTheme();
+          onClose();
         },
       },
     ];
@@ -93,28 +100,13 @@ export function CommandPalette() {
 
   useEffect(() => setIdx(0), [query]);
 
-  useEffect(() => {
-    const onKey = (e: KeyboardEvent): void => {
-      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
-        e.preventDefault();
-        setOpen((o) => !o);
-        setQuery('');
-      }
-    };
-    window.addEventListener('keydown', onKey);
-    return () => window.removeEventListener('keydown', onKey);
-  }, []);
-
   const runIdx = (i: number): void => {
     const c = results[i];
-    if (c) {
-      c.run();
-      setQuery('');
-    }
+    if (c) c.run();
   };
 
   return (
-    <Modal open={open} onClose={() => setOpen(false)} label="Command palette" width={520}>
+    <Modal open onClose={onClose} label="Command palette" width={520}>
       <div
         onKeyDown={(e) => {
           if (e.key === 'ArrowDown') {

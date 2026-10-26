@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { AnimatePresence, motion } from 'framer-motion';
+import { AnimatePresence, motion } from 'motion/react';
 import { saveData, loadData } from '../../lib/storage';
 import { todayKey, type AppData, type RoastIntensity } from '../../lib/schema';
 import { useSettings } from '../../stores/settings';

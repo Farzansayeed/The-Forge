@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { AnimatePresence, motion } from 'framer-motion';
+import { AnimatePresence, motion } from 'motion/react';
 import CountUp from '../../components/bits/CountUp';
 import SpotlightCard from '../../components/bits/SpotlightCard';
 import { StageDetail } from '../../components/tracker/StageDetail';

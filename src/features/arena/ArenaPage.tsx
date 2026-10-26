@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { motion } from 'framer-motion';
+import { motion } from 'motion/react';
 import { QUIZ_SETS, bossSet } from '../../data/quizzes';
 import { PHASES, stageById } from '../../data/curriculum';
 import { gateStatus } from '../../engines/quiz';

@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { AnimatePresence, motion } from 'framer-motion';
+import { AnimatePresence, motion } from 'motion/react';
 import { loadData } from '../../lib/storage';
 import { bedtimeStatus, type BedtimeMode } from '../../engines/accountability';
 

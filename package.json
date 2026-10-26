@@ -1,7 +1,7 @@
 {
   "name": "the-forge",
   "private": true,
-  "version": "3.0.0-phase0",
+  "version": "3.0.0",
   "type": "module",
   "description": "The Forge — C × DSA roadmap tracker (v3)",
   "scripts": {
@@ -14,7 +14,6 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "framer-motion": "^11.11.9",
     "lenis": "^1.1.14",
     "motion": "^12.43.0",
     "ogl": "^1.0.11",
