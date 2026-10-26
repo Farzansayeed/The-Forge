@@ -1,12 +1,12 @@
 # DESIGN.md — Technical Specification (v3)
 
-**Status:** The build contract. PLAN.md = strategy · CURRICULUM.md = content · **this file = how the app is actually built.** Nothing here is code yet.
+**Status:** The build contract. CURRICULUM.md = content · **this file = how the app is actually built.**
 
 ---
 
-## 1 · Stack (locked from PLAN.md)
+## 1 · Stack
 
-React 18 + TypeScript (strict) · Vite · Zustand (+persist) · Tailwind v4 + CSS custom-property tokens · Framer Motion · **React Bits (TS-TW variants)** for animated UI · **Lenis** for inertial smooth scrolling (auto-disabled under `prefers-reduced-motion`; verify sticky topbar + heatmap scroll in WS1) · React Router · Vitest + Testing Library · vite-plugin-pwa · Vercel. **Route transitions:** Framer Motion `AnimatePresence` (Barba.js was considered and rejected — it targets MPA/DOM-swap sites and fights React Router's ownership of the DOM).
+React 18 + TypeScript (strict) · Vite · Zustand (+persist) · Tailwind v4 + CSS custom-property tokens · **Motion** — single animation runtime, imported as `motion/react` (the renamed Framer Motion; the legacy `framer-motion` package is gone) · **React Bits (TS-TW variants)** for animated UI · **Lenis** for inertial smooth scrolling (auto-disabled under `prefers-reduced-motion`; verify sticky topbar + heatmap scroll in WS1) · React Router · Vitest + Testing Library · PWA via hand-written zero-dependency `sw.js` (not `vite-plugin-pwa`) · Vercel. **Route transitions:** Motion `AnimatePresence` (Barba.js was considered and rejected — it targets MPA/DOM-swap sites and fights React Router's ownership of the DOM).
 
 **Product name: "The Forge"** (UI, PWA, README). Repo: `The-Forge` — renamed from `c-learning-roadmap` on the user's word, 2026 (GitHub redirects old links; the v1 data key `c-learning-roadmap-v1` inside `legacy/` intentionally keeps its name). **App mark:** minimal hammer/anvil SVG (custom-drawn, one-color so phase accents tint it) — used in topbar, PWA icon and favicon.
 

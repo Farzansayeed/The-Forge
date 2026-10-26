@@ -1,6 +1,6 @@
 # PHASES.md — The Forge build plan, phase by phase
 
-**Companion to:** PLAN.md (strategy) · CURRICULUM.md (content) · DESIGN.md (tech spec, 16 decisions) · UXAUDIT.md (U1–U15 requirements).
+**Companion to:** CURRICULUM.md (content) · DESIGN.md (tech spec, 17 decisions) · UXAUDIT.md (U1–U15 requirements).
 **Source workstreams:** DESIGN.md §9, expanded into 9 phases. Each phase ends with the **Phase Gate** below.
 
 ---

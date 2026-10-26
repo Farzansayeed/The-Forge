@@ -1,6 +1,6 @@
 # CURRICULUM.md — C × DSA Roadmap v3, Stage-by-Stage Specification
 
-**Status:** Definitive content spec · the companion to PLAN.md · this is what gets encoded as typed data
+**Status:** Frozen at v3.0.0 — this prose spec is what `src/data/curriculum/` encodes; the typed data is canonical and CI-validated. Kept as the authoring reference for future stages.
 **Audience:** Total beginner (very low C experience). Every stage defines its own vocabulary.
 **Pacing reference:** ~3 h weekdays, ~6–7 h Sunday. Day budgets assume that rhythm.
 

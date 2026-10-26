@@ -1,6 +1,6 @@
 # ARCHITECTURE.md — The Forge · what is where
 
-**Purpose:** orientation. Anyone opening this repo should be able to answer "what does this file do, and where does my change belong?" within two minutes. This describes **what is built** — PLAN.md is strategy, CURRICULUM.md is content, DESIGN.md is the build contract, PHASES.md is the build history, UXAUDIT.md is the requirements list (U1–U15).
+**Purpose:** orientation. Anyone opening this repo should be able to answer "what does this file do, and where does my change belong?" within two minutes. This describes **what is built** — CURRICULUM.md is the frozen content spec, DESIGN.md is the build contract, PHASES.md is the build history, UXAUDIT.md is the requirements list (U1–U15).
 
 ---
 

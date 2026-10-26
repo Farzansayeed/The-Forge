@@ -1,7 +1,7 @@
 import type { Resource } from './types';
 
 /**
- * The resource canon (PLAN.md §2, CURRICULUM.md).
+ * The resource canon (CURRICULUM.md).
  * Every stage references these by id — one place to verify URLs.
  */
 export const RESOURCES = {

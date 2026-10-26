@@ -154,7 +154,7 @@ export function ArenaPage() {
         const set = bossSet(ph.id);
         const st = set ? gateStatus(set.id, data.quizResults) : null;
         const accent = ACCENT[ph.id];
-        // Boss = placement test (PLAN.md §1): attemptable cold, instantly
+        // Boss = placement test (DESIGN.md): attemptable cold, instantly
         // unlocks the phase. Only sequencing applies — clear the previous
         // phase's gate first (p1's gate has no predecessor and is always open).
         const phaseIdx = PHASES.findIndex((x) => x.id === ph.id);
